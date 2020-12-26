@@ -22,7 +22,7 @@ class KnockOutMixin(_BarrierMixin):
     after_trigger = AfterTrigger(terminate=True, observe=False)
 
 
-class KnockInMixin:
+class KnockInMixin(_BarrierMixin):
     """
     knock-in barrier mixin
     switch product future payoff, non-reversible
@@ -31,7 +31,7 @@ class KnockInMixin:
     after_trigger = AfterTrigger(terminate=False, observe=False)
 
 
-class LizardMixin:
+class LizardMixin(_BarrierMixin):
     """
     lizard barrier mixin
     terminate contract for protective purpose
@@ -40,7 +40,7 @@ class LizardMixin:
     after_trigger = AfterTrigger(terminate=True, observe=False)
 
 
-class AccrualMixin:
+class AccrualMixin(_BarrierMixin):
     """
     accrual barrier mixin
     no effect to contract term and observe regularly

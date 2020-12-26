@@ -2,13 +2,14 @@
 """doc string"""
 
 import abc
+from src.utils import Numerical
 
 
 class BasePayoff(metaclass=abc.ABCMeta):
     """payoff base class"""
 
     @abc.abstractmethod
-    def payoff(self, price: float) -> float:
+    def payoff(self, price: Numerical) -> Numerical:
         """
         get payoff of given asset price
 
