@@ -15,7 +15,7 @@ class _PositionBarrier(BaseBarrier):
         self.position = position
         self.inclusive = inclusive
 
-    def observe(self, price: Numerical) -> bool:
+    def _observe_impl(self, price: Numerical) -> bool:
         if self.inclusive:
             check_func = self._check_func[0]
         else:
@@ -23,6 +23,10 @@ class _PositionBarrier(BaseBarrier):
         if check_func(price, self.position):
             self.triggered = True
         return self.triggered
+
+    def __repr__(self):
+        status = 'trigger' if self.triggered else 'no-trigger'
+        return f'<{self.__class__.__name__} @{self.position} {status}>'
 
 
 class UpperBarrier(_PositionBarrier):

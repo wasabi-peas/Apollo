@@ -3,7 +3,7 @@
 
 import abc
 import datetime as dt
-from typing import List, Optional
+from typing import List, Optional, NoReturn
 from src.utils import Numerical
 
 
@@ -12,20 +12,35 @@ class AfterTrigger:
         self.terminate = terminate
         self.observe = observe
 
+    def __repr__(self):
+        terminate = 'terminate' if self.terminate else 'no-terminate'
+        observe = 'observe' if self.terminate else 'no-observe'
+        return f'<AfterTrigger {terminate}&{observe}>'
+
 
 class BaseBarrier(metaclass=abc.ABCMeta):
-    after_trigger = AfterTrigger(terminate=False, observe=False)
+    after_trigger = AfterTrigger(terminate=False, observe=True)
 
-    def __init__(self, observe_date: Optional[List[dt.date]]):
-        self.observe_dates = observe_date
+    def __init__(self, observe_dates: Optional[List[dt.date]] = None,
+                 *args, **kwargs):
+        self.observe_dates = observe_dates or []
         self.triggered = False
 
-    def register_observe_date(self, date_list: List[dt.date]):
+    def register_observe_date(self, date_list: List[dt.date]) -> NoReturn:
         self.observe_dates = date_list
 
-    @abc.abstractmethod
     def observe(self, price: Numerical) -> bool:
+        if self.triggered and not self.after_trigger.observe:
+            return self.triggered
+        return self._observe_impl(price)
+
+    @abc.abstractmethod
+    def _observe_impl(self, price: Numerical) -> bool:
         return self.triggered
+
+    def __repr__(self):
+        status = 'trigger' if self.triggered else 'no-trigger'
+        return f'<{self.__class__.__name__} {status}>'
 
 
 if __name__ == '__main__':

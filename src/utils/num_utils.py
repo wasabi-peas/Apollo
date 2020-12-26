@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """doc string"""
 
-from src.utils.special_typing import Numerical
+from src.utils.typing import Numerical
 
 
 class NumberCompare:

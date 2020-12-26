@@ -10,6 +10,9 @@ class BasePayoff(metaclass=abc.ABCMeta):
     def payoff(self, price: float) -> float:
         pass
 
+    def __repr__(self):
+        return self.__class__.__name__
+
 
 if __name__ == '__main__':
     pass
