@@ -82,3 +82,7 @@ def make_barrier(base_barrier: Type[BaseBarrier],
     statement = f'class {barrier_name}(barrier_mixin, base_barrier): pass'
     exec(statement, namespace)
     return namespace[barrier_name]
+
+
+if __name__ == '__main__':
+    pass
