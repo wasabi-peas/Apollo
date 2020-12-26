@@ -12,6 +12,7 @@ from .barrier_mixin import (
     AccrualMixin,
     make_barrier,
 )
+from .observer import BarrierObserver
 
 
 if __name__ == '__main__':

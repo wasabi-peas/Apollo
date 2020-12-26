@@ -7,7 +7,7 @@ from src.product.barrier.base_barrier import BaseBarrier
 from src.utils import Numerical
 
 
-class BarrierObserver:
+class _Observer:
 
     def __init__(self,
                  observe_date: dt.date,
@@ -27,11 +27,11 @@ class _ObserverIterator:
         self.barrier_list = barrier_list
         self.date_index = 0
 
-    def __next__(self) -> BarrierObserver:
+    def __next__(self) -> _Observer:
         if self.date_index < len(self.date_list):
             observe_date = self.date_list[self.date_index]
             self.date_index += 1
-            return BarrierObserver(
+            return _Observer(
                 observe_date=observe_date,
                 barrier_list=[barrier for barrier in self.barrier_list
                               if observe_date in barrier.observe_dates],
@@ -40,7 +40,7 @@ class _ObserverIterator:
             raise StopIteration
 
 
-class ObserverFactory:
+class BarrierObserver:
 
     def __init__(self, barrier_list: List[BaseBarrier] = None):
         self.barrier_list = barrier_list
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     barrier_2 = LowerBarrier(0.7, inclusive=False)
     barrier_1.register_observe_date([dt.date(2020, 1, 1), dt.date(2020, 2, 1)])
     barrier_2.register_observe_date([dt.date(2020, 1, 1), dt.date(2020, 1, 16), dt.date(2020, 2, 1)])
-    for observer in ObserverFactory(barrier_list=[barrier_1, barrier_2]):
+    for observer in BarrierObserver(barrier_list=[barrier_1, barrier_2]):
         print(observer.observe_date)
         print(observer.barrier_list)
         print('\n')
