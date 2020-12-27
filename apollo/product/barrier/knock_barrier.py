@@ -7,15 +7,20 @@ from apollo.product.barrier.position_barrier import PositionBarrier
 from apollo.utils import Numerical
 
 
-class KnockOutBarrier(PositionBarrier):
-    """
-    knock-out barrier
-    terminate contract and post a different payoff immediately
-    """
+class _KnockBarrier(PositionBarrier):
+    """stop observe once triggered"""
     def _observe_impl(self, date: dt.date, price: Numerical) -> NoReturn:
         super()._observe_impl(date, price)
         if self.triggered:
             self.do_observe = False
+
+
+class KnockOutBarrier(_KnockBarrier):
+    """
+    knock-out barrier
+    terminate contract and post a different payoff immediately
+    """
+    pass
 
 
 class KnockInBarrier(PositionBarrier):
