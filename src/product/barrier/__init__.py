@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 """doc string"""
 
-from .ul_barrier import (
-    UpperBarrier,
-    LowerBarrier,
+from .position_barrier import (
+    PositionBarrier,
 )
-from .barrier_mixin import (
-    KnockOutMixin,
-    KnockInMixin,
-    LizardMixin,
-    AccrualMixin,
-    make_barrier,
+from .knock_barrier import (
+    KnockOutBarrier,
+    KnockInBarrier,
 )
-from .observer import BarrierObserver
+from .observer import (
+    BarrierObserver,
+)
 
 
 if __name__ == '__main__':

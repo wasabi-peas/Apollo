@@ -7,23 +7,11 @@ from typing import List, Optional, NoReturn
 from src.utils import Numerical
 
 
-class AfterTrigger:
-    """performance record after barrier is triggered"""
-    def __init__(self, terminate: bool, observe: bool):
-        self.terminate = terminate
-        self.observe = observe
-
-    def __repr__(self):
-        terminate = 'terminate' if self.terminate else 'no-terminate'
-        observe = 'observe' if self.terminate else 'no-observe'
-        return f'<AfterTrigger {terminate}&{observe}>'
-
-
-class BaseBarrier(metaclass=abc.ABCMeta):
+class Barrier(metaclass=abc.ABCMeta):
     """barrier base class"""
-    after_trigger = AfterTrigger(terminate=False, observe=True)
 
-    def __init__(self, observe_dates: Optional[List[dt.date]] = None,
+    def __init__(self,
+                 observe_dates: Optional[List[dt.date]] = None,
                  *args, **kwargs):
         """
         parameters
@@ -32,33 +20,34 @@ class BaseBarrier(metaclass=abc.ABCMeta):
         """
         self.observe_dates = observe_dates or []
         self.triggered = False
+        self.do_observe = True
 
-    def register_observe_date(self, date_list: List[dt.date]) -> NoReturn:
-        self.observe_dates = date_list
-
-    def observe(self, price: Numerical) -> bool:
+    def observe(self, date: dt.date, price: Numerical) -> bool:
         """
         observe if barrier is triggered under given price
 
         parameters
         ----------
+        date: observe date
         price: asset price or performance
 
         returns
         -------
-        barrier is triggered or not
+        barrier is observed or not (not triggered or not)
+            * for triggered status, please call barrier.triggered
         """
-        if self.triggered and not self.after_trigger.observe:
-            return self.triggered
-        return self._observe_impl(price)
+        if self.do_observe and date in self.observe_dates:
+            self._observe_impl(date, price)
+            return True
+        return False
 
     @abc.abstractmethod
-    def _observe_impl(self, price: Numerical) -> bool:
-        return self.triggered
+    def _observe_impl(self, date: dt.date, price: Numerical) -> NoReturn:
+        pass
 
     def __repr__(self):
-        status = 'trigger' if self.triggered else 'no-trigger'
-        return f'<{self.__class__.__name__} {status}>'
+        status = ' [T]' if self.triggered else ''
+        return f'<{self.__class__.__name__}{status}>'
 
 
 if __name__ == '__main__':
