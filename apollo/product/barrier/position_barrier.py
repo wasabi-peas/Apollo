@@ -3,8 +3,8 @@
 
 import datetime as dt
 from typing import List, Union, NoReturn
-from src.product.barrier.base_barrier import Barrier
-from src.utils import Numerical, precision_8
+from apollo.product.barrier.base_barrier import Barrier
+from apollo.utils import Numerical, precision_8
 
 
 class PositionBarrier(Barrier):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """doc string"""
 
-from src.utils.typing import Numerical
+from apollo.utils.typing import Numerical
 
 
 class NumberCompare:

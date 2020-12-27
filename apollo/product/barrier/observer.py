@@ -3,8 +3,8 @@
 
 import datetime as dt
 from typing import List, Union, NoReturn
-from src.product.barrier.base_barrier import Barrier
-from src.utils import Numerical
+from apollo.product.barrier.base_barrier import Barrier
+from apollo.utils import Numerical
 
 
 class _Observer:
@@ -83,7 +83,7 @@ class BarrierObserver:
 
     examples
     --------
-    >>> from src.product.barrier import KnockOutBarrier, KnockInBarrier
+    >>> from apollo.product.barrier import KnockOutBarrier, KnockInBarrier
     >>> ko_barrier = KnockOutBarrier(position=1.2, direction='upper', inclusive=True,
     >>>                              observe_dates=[dt.date(2021, 1, 1), dt.date(2021, 2, 1)])
     >>> print(ko_barrier)

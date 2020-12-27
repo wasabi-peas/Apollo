@@ -3,8 +3,8 @@
 
 import datetime as dt
 from typing import NoReturn
-from src.product.barrier.position_barrier import PositionBarrier
-from src.utils import Numerical
+from apollo.product.barrier.position_barrier import PositionBarrier
+from apollo.utils import Numerical
 
 
 class KnockOutBarrier(PositionBarrier):

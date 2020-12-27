@@ -4,7 +4,7 @@
 import abc
 import datetime as dt
 from typing import List, Optional, NoReturn
-from src.utils import Numerical
+from apollo.utils import Numerical
 
 
 class Barrier(metaclass=abc.ABCMeta):

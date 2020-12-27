@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """doc string"""
 
-from src.product.payoff.base_payoff import Payoff
-from src.utils import Numerical
+from apollo.product.payoff.base_payoff import Payoff
+from apollo.utils import Numerical
 
 
 class ConstantPayoff(Payoff):

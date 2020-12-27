@@ -3,7 +3,7 @@
 
 import abc
 from typing import Optional
-from src.utils import Numerical
+from apollo.utils import Numerical
 
 
 class Payoff(metaclass=abc.ABCMeta):
