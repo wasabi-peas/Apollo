@@ -10,9 +10,7 @@ from apollo.utils import Numerical
 class _Observer:
     """barrier observer"""
 
-    def __init__(self,
-                 date: dt.date,
-                 barrier_list: List[Barrier]):
+    def __init__(self, date: dt.date, barrier_list: List[Barrier]):
         """
         barrier observer is created by _ObserverIterator
         * manually created by coder is not recommended
@@ -47,9 +45,7 @@ class _Observer:
 class _ObserverIterator:
     """iterator for barrier observers"""
 
-    def __init__(self,
-                 date_list: List[dt.date],
-                 barrier_list: List[Barrier]):
+    def __init__(self, date_list: List[dt.date], barrier_list: List[Barrier]):
         """
         observer iterator is created by BarrierObserver
         * manually created by coder is not recommended

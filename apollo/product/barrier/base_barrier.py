@@ -10,9 +10,7 @@ from apollo.utils import Numerical
 class Barrier(metaclass=abc.ABCMeta):
     """barrier base class"""
 
-    def __init__(self,
-                 observe_dates: Optional[List[dt.date]] = None,
-                 *args, **kwargs):
+    def __init__(self, observe_dates: Optional[List[dt.date]] = None):
         """
         parameters
         ----------

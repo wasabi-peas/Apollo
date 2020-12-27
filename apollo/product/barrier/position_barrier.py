@@ -21,8 +21,7 @@ class PositionBarrier(Barrier):
                  position: Union[Numerical, List[Numerical]],
                  observe_dates: Union[List[dt.date]],
                  direction: str = 'upper',
-                 inclusive: bool = True,
-                 *args, **kwargs):
+                 inclusive: bool = True):
         """
         parameters
         ----------
@@ -32,7 +31,7 @@ class PositionBarrier(Barrier):
         direction: upper barrier or lower barrier
         inclusive: trigger or not when asset price equals to barrier position
         """
-        super().__init__(observe_dates, *args, **kwargs)
+        super().__init__(observe_dates)
         assert direction in ['upper', 'lower'], \
             f"direction should be either 'upper' or 'lower', " \
             f"got '{direction}'"

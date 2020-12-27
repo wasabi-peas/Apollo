@@ -12,8 +12,7 @@ class Payoff(metaclass=abc.ABCMeta):
     def __init__(self,
                  rounding: Optional[int] = None,
                  accrual_basis: int = 365,
-                 accrual_days: int = 365,
-                 *args, **kwargs):
+                 accrual_days: int = 365):
         """
         parameters
         ----------
