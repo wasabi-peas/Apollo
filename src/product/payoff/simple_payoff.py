@@ -1,39 +1,50 @@
 # -*- coding: utf-8 -*-
 """doc string"""
 
-from src.product.payoff.base_payoff import BasePayoff
+from src.product.payoff.base_payoff import Payoff
 from src.utils import Numerical
 
 
-class ConstantPayoff(BasePayoff):
+class ConstantPayoff(Payoff):
     """constant payoff"""
 
-    def __init__(self, rate: Numerical):
+    def __init__(self,
+                 rate: Numerical = 0,
+                 *args, **kwargs):
         """
         parameters
         ----------
         rate: constant payoff rate
+        *args, **kwargs: see Payoff, including:
+            rounding, accrual_basis, accrual_days
         """
+        super().__init__(*args, **kwargs)
         self.rate = rate
 
-    def payoff(self, price: Numerical) -> Numerical:
+    def _payoff_impl(self, price: Numerical) -> Numerical:
         return self.rate
 
 
-class DeltaOnePayoff(BasePayoff):
+class DeltaOnePayoff(Payoff):
     """delta one payoff"""
 
-    def __init__(self, strike: Numerical, weight: Numerical):
+    def __init__(self,
+                 strike: Numerical = 1,
+                 weight: Numerical = 1,
+                 *args, **kwargs):
         """
         parameters
         ----------
         strike: strike price or level
         weight: participation rate
+        *args, **kwargs: see Payoff, including:
+            rounding, accrual_basis, accrual_days
         """
+        super().__init__(*args, **kwargs)
         self.strike = strike
         self.weight = weight
 
-    def payoff(self, price: Numerical) -> Numerical:
+    def _payoff_impl(self, price: Numerical) -> Numerical:
         return (price - self.strike) * self.weight
 
 
