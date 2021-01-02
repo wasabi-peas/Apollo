@@ -124,7 +124,7 @@ class SnowBallSimulate:
             rate=parameters['MaturityBonusCoupon'],
         )
 
-    def simulate_live(self, path_generator, num_of_path):
+    def simulate(self, path_generator, num_of_path):
         with timer('prepare'):
             observer = Observer()
             observer.register_barrier('KO', self.ko_barrier)
@@ -134,50 +134,66 @@ class SnowBallSimulate:
             live_product = product_list
             live_path = np.ones(num_of_path)
             prev_date = self.strike_date
-            observe_batch = np.vectorize(self.observe, cache=True)
+            ko_batch = np.vectorize(self.ko, cache=True)
+            ki_batch = np.vectorize(self.ki, cache=True)
+            retire_batch = np.vectorize(self.retire, cache=True)
         with timer('simulate'):
             for date, obs_func in observer:
-                with timer('simulate 1 day'):
-                    live_index = np.where(live_func(live_product))
-                    live_path = live_path[live_index]
-                    live_product = live_product[live_index]
-                    new_path = path_generator.get_path(len(live_product))
-                    live_path = populate_path(live_path, new_path, date - prev_date)
-                    observe_batch(live_path, live_product, date, obs_func)
-                    prev_date = date
+                live_index = np.where(live_func(live_product))
+                live_path = live_path[live_index]
+                live_product = live_product[live_index]
+                if len(live_product) == 0:
+                    break
+                new_path = path_generator.get_path(len(live_product))
+                live_path = populate_path(live_path, new_path, date - prev_date)
+                if 'KO' in obs_func:
+                    ko = obs_func['KO'](live_path)
+                    ko_product = live_product[np.where(ko)]
+                    if len(ko_product) > 0:
+                        ko_batch(self.ko_payoff[date], live_path[np.where(ko)], ko_product, date)
+                    nko_path = live_path[np.where(~ko)]
+                    nko_product = live_product[np.where(~ko)]
+                else:
+                    nko_path = live_path
+                    nko_product = live_product
+                if 'KI' in obs_func:
+                    ki = obs_func['KI'](nko_path)
+                    ki_product = nko_product[np.where(ki)]
+                    if len(ki_product) > 0:
+                        ki_batch(ki_product)
+                if date == self.maturity:
+                    retire_batch(nko_path, nko_product, date)
+                prev_date = date
         with timer('payoff'):
             pv = np.vectorize(self.calculate_pv)(product_list)
             print(np.average(pv))
 
     def calculate_pv(self, product):
         r = 0.03
+        pv = 0
+        for payoff in product.payoff:
+            t = (payoff.date - self.strike_date).days
+            df = np.exp(- r * t / 365)
+            pv += df * payoff.amount
+        return pv
 
-        def discount_payoff(payoff):
-            return np.exp(- r * (payoff.date - self.strike_date).days / 365) * payoff.amount
+    def ko(self, payoff, price, product, date):
+        product.knock_out()
+        product.pending_payoff = payoff.payoff(price)
+        product.confirm_payoff(date, 'knock out rebate rate')
 
-        return np.vectorize(discount_payoff)(product.payoff).sum()
+    def ki(self, product):
+        if product.current_state != product.knocked_in:
+            product.knock_in()
 
-    def observe(self, price: Numerical, product: SnowballProduct, date: dt.date, obs_func):
-        if product.retired:
-            return
-        if 'KO' in obs_func:
-            if obs_func['KO'](price):
-                product.knock_out()
-                product.pending_payoff = self.ko_payoff[date].payoff(price)
-                product.confirm_payoff(date, 'knock out rebate rate')
-                return
-        if 'KI' in obs_func:
-            if product.current_state != product.knocked_in:
-                if obs_func['KI'](price):
-                    product.knock_in()
-        if date == self.maturity:
-            product.retired = True
-            if product.current_state == product.knocked_in:
-                product.pending_payoff = self.ki_payoff.payoff(price)
-                product.confirm_payoff(date, 'knock in put value')
-            else:
-                product.pending_payoff = self.mat_payoff.payoff(price)
-                product.confirm_payoff(date, 'maturity bonus coupon')
+    def retire(self, price, product, date):
+        product.retired = True
+        if product.current_state == product.knocked_in:
+            product.pending_payoff = self.ki_payoff.payoff(price)
+            product.confirm_payoff(date, 'knock in put value')
+        else:
+            product.pending_payoff = self.mat_payoff.payoff(price)
+            product.confirm_payoff(date, 'maturity bonus coupon')
 
 
 def populate_path(prev_path, new_path, date_pass):
@@ -212,4 +228,4 @@ if __name__ == '__main__':
 
     # import cProfile
     # cProfile.run('simulate.simulate_live(PathGenerator(), 100000)')
-    simulate.simulate_live(PathGenerator(), 100000)
+    simulate.simulate(PathGenerator(), 100000)

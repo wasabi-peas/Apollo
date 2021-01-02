@@ -1,46 +1,51 @@
 # -*- coding: utf-8 -*-
 """doc string"""
 
+import numpy as np
+from typing import Union
 from apollo.utils.typing import Numerical
 
 
 class NumberCompare:
     """compare number based on given precision"""
 
-    def __init__(self, digit: int = -8):
+    def __init__(self, abs_tol=1E-8):
         """
         parameters
         ----------
-        digit: precision digit (1Ex)
-            e.x. digit = -3, then precision = 0.001
-            e.x. digit = 2, then precision = 100
+        abs_tol: absolute tolerance
         """
-        self._precision = 10 ** digit
+        self._abs_tol = abs_tol
 
-    def equal(self, num1: Numerical, num2: Numerical) -> bool:
+    def equal(self, num1: Union[Numerical, np.array],
+              num2: Union[Numerical, np.array]) -> Union[bool, np.array]:
         """check if num1 == num2"""
-        return abs(num1 - num2) < self._precision
+        return np.isclose(num1, num2, rtol=0, atol=self._abs_tol)
 
-    def greater(self, num1: Numerical, num2: Numerical) -> bool:
+    def greater(self, num1: Union[Numerical, np.array],
+                num2: Union[Numerical, np.array]) -> Union[bool, np.array]:
         """check if num1 > num2"""
-        return (num1 > num2) and (not self.equal(num1, num2))
+        return np.greater(num1, num2) & (~self.equal(num1, num2))
 
-    def smaller(self, num1: Numerical, num2: Numerical) -> bool:
+    def less(self, num1: Union[Numerical, np.array],
+             num2: Union[Numerical, np.array]) -> Union[bool, np.array]:
         """check if num1 < num2"""
-        return (num1 < num2) and (not self.equal(num1, num2))
+        return np.less(num1, num2) & (~self.equal(num1, num2))
 
-    def not_greater(self, num1: Numerical, num2: Numerical) -> bool:
+    def greater_equal(self, num1: Union[Numerical, np.array],
+                      num2: Union[Numerical, np.array]) -> Union[bool, np.array]:
         """check if num1 <= num2"""
-        return (num1 < num2) or self.equal(num1, num2)
+        return np.greater(num1, num2) | self.equal(num1, num2)
 
-    def not_smaller(self, num1: Numerical, num2: Numerical) -> bool:
+    def less_equal(self, num1: Union[Numerical, np.array],
+                   num2: Union[Numerical, np.array]) -> Union[bool, np.array]:
         """check if num1 >= num2"""
-        return (num1 > num2) or self.equal(num1, num2)
+        return np.less(num1, num2) | self.equal(num1, num2)
 
 
-precision_2 = NumberCompare(-2)
-precision_4 = NumberCompare(-4)
-precision_8 = NumberCompare(-8)
+precision_2 = NumberCompare(1E-2)
+precision_4 = NumberCompare(1E-4)
+precision_8 = NumberCompare(1E-8)
 
 
 if __name__ == '__main__':

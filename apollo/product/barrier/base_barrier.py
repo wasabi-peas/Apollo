@@ -3,7 +3,7 @@
 
 import abc
 import datetime as dt
-from typing import List, Optional, Callable, Union
+from typing import List, Optional, Callable
 from apollo.utils import Numerical
 
 

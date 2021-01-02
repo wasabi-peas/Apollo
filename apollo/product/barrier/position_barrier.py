@@ -2,9 +2,10 @@
 """doc string"""
 
 import datetime as dt
+import numpy as np
 from typing import List, Union, Callable
 from apollo.product.barrier.base_barrier import Barrier
-from apollo.utils import Numerical, precision_8
+from apollo.utils import Numerical, LazyProperty, precision_8
 
 
 class PositionBarrier(Barrier):
@@ -12,10 +13,6 @@ class PositionBarrier(Barrier):
     most common barrier to compare asset price and barrier position
     to decide if barrier should be triggered or not
     """
-    _all_compare_func = {
-        'upper': (precision_8.greater, precision_8.not_smaller),
-        'lower': (precision_8.smaller, precision_8.not_greater)
-    }
 
     def __init__(self,
                  position: Union[Numerical, List[Numerical]],
@@ -45,7 +42,7 @@ class PositionBarrier(Barrier):
         else:
             self.position = position
         self.inclusive = inclusive
-        self._compare_func = self._all_compare_func[self.direction][int(self.inclusive)]
+        self.precision = precision_8
 
     def _position_on_date(self, date: dt.date) -> Numerical:
         if isinstance(self.position, dict):
@@ -53,7 +50,17 @@ class PositionBarrier(Barrier):
         else:
             return self.position
 
-    def observe(self, date: dt.date, price: Numerical) -> bool:
+    @LazyProperty
+    def _compare_func(self):
+        if self.direction == 'upper':
+            return self.precision.greater_equal \
+                if self.inclusive else self.precision.greater
+        else:
+            return self.precision.less_equal \
+                if self.inclusive else self.precision.less
+
+    def observe(self, date: dt.date, price: Union[Numerical, np.array]
+                ) -> Union[bool, np.array]:
         position = self._position_on_date(date)
         return self._compare_func(price, position)
 
