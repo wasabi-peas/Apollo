@@ -3,7 +3,7 @@
 
 import abc
 import datetime as dt
-from typing import List, Optional, NoReturn, Union
+from typing import List, Optional, Callable, Union
 from apollo.utils import Numerical
 
 
@@ -18,6 +18,7 @@ class Barrier(metaclass=abc.ABCMeta):
         """
         self.observe_dates = observe_dates or []
 
+    @abc.abstractmethod
     def observe(self, date: dt.date, price: Numerical) -> bool:
         """
         observe if barrier is triggered under given price
@@ -29,30 +30,27 @@ class Barrier(metaclass=abc.ABCMeta):
 
         returns
         -------
-        barrier is observed or not (not triggered or not)
-            * for triggered status, please call barrier.triggered
+        barrier is triggered or not
         """
-        if date in self.observe_dates:
-            return self._observe_impl(date, price)
-        return False
+        pass
 
     @abc.abstractmethod
-    def _observe_impl(self, date: dt.date, price: Numerical) -> bool:
+    def observe_func(self, date: dt.date) -> Callable:
+        """
+        return an observe function with price as only parameter
+
+        parameters
+        ----------
+        date: observe date
+
+        returns
+        -------
+        observe function takes price and return trigger or not
+        """
         pass
 
     def __repr__(self):
         return f'<{self.__class__.__name__}>'
-
-
-def observe_schedule(*barriers: Union[Barrier, List[Barrier]]) -> List[dt.date]:
-    observe_dates = set()
-    for barrier in barriers:
-        if isinstance(barrier, list):
-            for each_barrier in barrier:
-                observe_dates.update(each_barrier.observe_dates)
-        else:
-            observe_dates.update(barrier.observe_dates)
-    return sorted(observe_dates)
 
 
 if __name__ == '__main__':
