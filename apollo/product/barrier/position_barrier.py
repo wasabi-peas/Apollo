@@ -51,17 +51,16 @@ class PositionBarrier(Barrier):
         """function to compare price and position"""
         return self._all_compare_func[self.direction][int(self.inclusive)]
 
-    def _observe_impl(self, date: dt.date, price: Numerical) -> NoReturn:
+    def _observe_impl(self, date: dt.date, price: Numerical) -> bool:
         if isinstance(self.position, dict):
             position = self.position[date]
         else:
             position = self.position
-        self.triggered = self._compare_func(price, position)
+        return self._compare_func(price, position)
 
     def __repr__(self):
-        status = ' [T]' if self.triggered else ''
         description = f'{self.direction}@{self.position}'
-        return f'<{self.__class__.__name__} {description}{status}>'
+        return f'<{self.__class__.__name__} {description}>'
 
 
 if __name__ == '__main__':
