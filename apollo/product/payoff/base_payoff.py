@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """doc string"""
 
 import abc
@@ -8,6 +7,14 @@ from apollo.utils import Numerical
 
 class Payoff(metaclass=abc.ABCMeta):
     """payoff base class"""
+    _func_cls = None
+    _mapping = {
+        'level': 'rate',
+        'slope': 'weight',
+        'origin': 'strike',
+        'sign': '_sign',
+        'inclusive': 'inclusive'
+    }
 
     def __init__(self,
                  rounding: Optional[int] = None,
@@ -45,9 +52,20 @@ class Payoff(metaclass=abc.ABCMeta):
             payoff = round(payoff, self.rounding)
         return payoff
 
-    @abc.abstractmethod
+    def _parameter_mapping(self):
+        param = {}
+        for k, v in self._mapping.items():
+            if hasattr(self, v):
+                param[k] = getattr(self, v)
+        return param
+
     def _payoff_impl(self, price: Numerical) -> Numerical:
-        pass
+        kls_param = self._parameter_mapping()
+        payoff = 0
+        for kls in self._func_cls:
+            inst = kls(**kls_param)
+            payoff += inst.formula(price)
+        return payoff
 
     def __repr__(self):
         return self.__class__.__name__

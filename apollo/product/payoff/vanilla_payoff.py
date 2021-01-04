@@ -3,10 +3,12 @@
 
 from apollo.product.payoff.base_payoff import Payoff
 from apollo.utils import Numerical
+from apollo.product.payoff.basic_functions import Ramp
 
 
 class VanillaPayoff(Payoff):
     """vanilla option payoff"""
+    _func_cls = [Ramp]
     _sign = 0
 
     def __init__(self,
@@ -24,9 +26,6 @@ class VanillaPayoff(Payoff):
         super().__init__(*args, **kwargs)
         self.strike = strike
         self.weight = weight
-
-    def _payoff_impl(self, price: Numerical) -> Numerical:
-        return max(self._sign * (price - self.strike), 0) * self.weight
 
 
 class VanillaCallPayoff(VanillaPayoff):
@@ -46,4 +45,9 @@ class VanillaPutPayoff(VanillaPayoff):
 
 
 if __name__ == '__main__':
-    pass
+    c = VanillaCallPayoff(strike=1.2, weight=0.8)
+    print(c.payoff(1))
+    print(c.payoff(1.4))
+    p = VanillaPutPayoff(strike=0.8, weight=1.2)
+    print(p.payoff(1.4))
+    print(p.payoff(0.5))

@@ -1,12 +1,13 @@
-# -*- coding: utf-8 -*-
 """doc string"""
 
 from apollo.product.payoff.base_payoff import Payoff
 from apollo.utils import Numerical
+from apollo.product.payoff.basic_functions import Constant, Linear
 
 
 class ConstantPayoff(Payoff):
     """constant payoff"""
+    _func_cls = [Constant]
 
     def __init__(self,
                  rate: Numerical = 0,
@@ -21,12 +22,10 @@ class ConstantPayoff(Payoff):
         super().__init__(*args, **kwargs)
         self.rate = rate
 
-    def _payoff_impl(self, price: Numerical) -> Numerical:
-        return self.rate
-
 
 class DeltaOnePayoff(Payoff):
     """delta one payoff"""
+    _func_cls = [Linear]
 
     def __init__(self,
                  strike: Numerical = 1,
@@ -44,9 +43,9 @@ class DeltaOnePayoff(Payoff):
         self.strike = strike
         self.weight = weight
 
-    def _payoff_impl(self, price: Numerical) -> Numerical:
-        return (price - self.strike) * self.weight
-
 
 if __name__ == '__main__':
-    pass
+    cp = ConstantPayoff(rate=0.12)
+    print(cp.payoff(price=12))
+    d1p = DeltaOnePayoff(strike=1, weight=2)
+    print(d1p.payoff(price=1.25))
