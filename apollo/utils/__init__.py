@@ -7,6 +7,9 @@ from .num_utils import (
     precision_4,
     precision_8,
 )
+from .prop_utils import (
+    LazyProperty,
+)
 from .typing import Numerical
 
 

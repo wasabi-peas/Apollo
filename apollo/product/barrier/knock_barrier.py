@@ -9,10 +9,7 @@ from apollo.utils import Numerical
 
 class _KnockBarrier(PositionBarrier):
     """stop observe once triggered"""
-    def _observe_impl(self, date: dt.date, price: Numerical) -> NoReturn:
-        super()._observe_impl(date, price)
-        if self.triggered:
-            self.do_observe = False
+    pass
 
 
 class KnockOutBarrier(_KnockBarrier):
@@ -23,7 +20,7 @@ class KnockOutBarrier(_KnockBarrier):
     pass
 
 
-class KnockInBarrier(PositionBarrier):
+class KnockInBarrier(_KnockBarrier):
     """
     knock-in barrier
     switch product future payoff, non-reversible

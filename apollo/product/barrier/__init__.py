@@ -9,7 +9,7 @@ from .knock_barrier import (
     KnockInBarrier,
 )
 from .observer import (
-    BarrierObserver,
+    Observer,
 )
 
 
